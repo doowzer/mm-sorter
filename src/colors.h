@@ -47,8 +47,9 @@ void init_colors(void)
         mm_color[ORANGE][LOWER] = cvScalar(10, 90, 120, 0);
         mm_color[ORANGE][UPPER] = cvScalar(10, 256, 256, 0);
 
-        mm_color[BROWN][LOWER] = cvScalar(10, 50, 0, 0);
-        mm_color[BROWN][UPPER] = cvScalar(20, 100, 100, 0);
+        mm_color[BROWN][LOWER] = cvScalar(16, 26, 0, 0);
+        mm_color[BROWN][UPPER] = cvScalar(16, 256, 60, 0);
+
 }
 
 #endif

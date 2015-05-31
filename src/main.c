@@ -76,6 +76,8 @@ int main(int argc, char *argv[])
                 cvNamedWindow(BIN_WND, CV_WINDOW_AUTOSIZE);
                 cvMoveWindow(BIN_WND, (img_size.width * 1) + 5, 0);
 
+                cvNamedWindow("hsv", CV_WINDOW_AUTOSIZE);
+
                 cvSetMouseCallback(RAW_WND, on_mouse, NULL);
 
                 create_trackbars(BIN_WND);
@@ -99,6 +101,7 @@ int main(int argc, char *argv[])
 
                 if (adjust) {
                         cvShowImage(BIN_WND, bin_frame);
+                        cvShowImage("hsv", hsv_frame);
                 }
 
                 key = (char) cvWaitKey(DELAY);
@@ -123,13 +126,8 @@ int main(int argc, char *argv[])
  */
 static void on_mouse(int event, int x, int y, int flags, void *data)
 {
-        switch (event) {
-                case CV_EVENT_LBUTTONDOWN:
-                        get_hsv_color(y, x);
-                        break;
-
-                default:
-                        break;
+        if (event == CV_EVENT_LBUTTONDOWN) {
+                get_hsv_color(x, y);
         }
 }
 
@@ -203,12 +201,12 @@ static void detect_colors(void)
                                 break;
 
                         case ORANGE:
-                                rgb = CV_RGB(143, 74, 32);
+                                rgb = CV_RGB(238, 64, 0);
                                 /* serial_send("ORANGE\n"); */
                                 break;
 
                         case BROWN:
-                                rgb = CV_RGB(139, 69, 19);
+                                rgb = CV_RGB(139, 62, 47);
                                 /* serial_send("BROWN\n"); */
                                 break;
 
