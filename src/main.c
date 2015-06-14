@@ -16,6 +16,7 @@
  */
 #define DELAY 33
 #define RAW_WND "raw"
+#define HSW_WND "hsv"
 #define BIN_WND "binary"
 
 IplImage *raw_frame, *hsv_frame, *bin_frame;
@@ -76,16 +77,14 @@ int main(int argc, char *argv[])
                 cvNamedWindow(BIN_WND, CV_WINDOW_AUTOSIZE);
                 cvMoveWindow(BIN_WND, (img_size.width * 1) + 5, 0);
 
-                cvNamedWindow("hsv", CV_WINDOW_AUTOSIZE);
-
                 cvSetMouseCallback(RAW_WND, on_mouse, NULL);
 
                 create_trackbars(BIN_WND);
+
+                cvNamedWindow(HSW_WND, CV_WINDOW_AUTOSIZE);
         }
 
         init_colors();
-
-        /* serial_setup("/dev/ttyACM2"); */
 
         while (key != 27) {
                 raw_frame = cvQueryFrame(camera);
@@ -101,7 +100,7 @@ int main(int argc, char *argv[])
 
                 if (adjust) {
                         cvShowImage(BIN_WND, bin_frame);
-                        cvShowImage("hsv", hsv_frame);
+                        cvShowImage(HSW_WND, hsv_frame);
                 }
 
                 key = (char) cvWaitKey(DELAY);
@@ -115,8 +114,6 @@ int main(int argc, char *argv[])
 
         cvReleaseCapture(&camera);
         cvDestroyAllWindows();
-
-        /* serial_close(); */
 
         return 0;
 }
@@ -138,8 +135,8 @@ static void get_hsv_color(int y, int x)
 {
         CvScalar c;
 
-
         cvCvtColor(raw_frame, hsv_frame, CV_BGR2HSV);
+        cvSmooth(hsv_frame, hsv_frame, CV_GAUSSIAN, 1, 1, 0, 0);
 
         c = cvGet2D(hsv_frame, y, x);
 
@@ -166,6 +163,7 @@ static void detect_colors(void)
 
 
         cvCvtColor(raw_frame, hsv_frame, CV_BGR2HSV);
+        cvSmooth(hsv_frame, hsv_frame, CV_GAUSSIAN, 1, 1, 0, 0);
 
         for (i = 0; i < COLORS; i++) {
 
@@ -178,40 +176,34 @@ static void detect_colors(void)
                 filter();
 
                 color = cvCountNonZero(bin_frame);
+
                 if (color >= COLOR_THRESHOLD) {
                         switch (i) {
                         case RED:
                                 rgb = CV_RGB(255, 0, 0);
-                                /* serial_send("RED\n"); */
                                 break;
 
                         case GREEN:
                                 rgb = CV_RGB(0, 128, 0);
-                                /* serial_send("GREEN\n"); */
                                 break;
 
                         case BLUE:
                                 rgb = CV_RGB(0, 0, 255);
-                                /* serial_send("BLUE\n"); */
                                 break;
 
                         case YELLOW:
                                 rgb = CV_RGB(255, 255, 0);
-                                /* serial_send("YELLOW\n"); */
                                 break;
 
                         case ORANGE:
                                 rgb = CV_RGB(238, 64, 0);
-                                /* serial_send("ORANGE\n"); */
                                 break;
 
                         case BROWN:
                                 rgb = CV_RGB(139, 62, 47);
-                                /* serial_send("BROWN\n"); */
                                 break;
 
                         default:
-                                /* serial_send("NONE\n"); */
                                 break;
                         }
 
@@ -234,10 +226,12 @@ static void detect_colors(void)
 /**
  * filter - Filter binary image
  *
- * Filter binary image using Dilate and Erode.
+ * Filter binary image using Smooth, Dilate and Erode.
  */
 static void filter(void)
 {
+        cvSmooth(bin_frame, bin_frame, CV_GAUSSIAN, 3, 3, 0, 0);
+
         cvDilate(bin_frame, bin_frame, NULL, 4);
         cvDilate(bin_frame, bin_frame, NULL, 4);
 

@@ -21,6 +21,7 @@ enum {
 CvScalar mm_color[COLORS][2];
 CvScalar lhsv, uhsv;
 
+
 /**
  * Prototypes
  */

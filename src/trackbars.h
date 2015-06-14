@@ -24,7 +24,6 @@ void set_s_lower(int value);
 void set_v_lower(int value);
 void create_trackbars(const char *wndname);
 
-
 /**
  *
  */
