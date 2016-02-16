@@ -22,6 +22,7 @@
 IplImage *raw_frame, *hsv_frame, *bin_frame;
 CvSeq *contours;
 CvMemStorage *storage;
+CvFont font;
 int gui = 1, adjust = 0;
 
 /**
@@ -31,6 +32,7 @@ static void on_mouse(int event, int x, int y, int flags, void *data);
 static void get_hsv_color(int y, int x);
 static void detect_colors(void);
 static void filter(void);
+static void print(const char *str);
 
 
 /**
@@ -54,6 +56,8 @@ int main(int argc, char *argv[])
 
         cvSetCaptureProperty(camera, CV_CAP_PROP_FRAME_WIDTH, 640);
         cvSetCaptureProperty(camera, CV_CAP_PROP_FRAME_HEIGHT, 480);
+
+        cvInitFont(&font, CV_FONT_HERSHEY_COMPLEX_SMALL, 1.0, 1.0, 0.0, 1, 10);
 
         raw_frame = cvQueryFrame(camera);
         if (raw_frame == NULL) {
@@ -181,26 +185,32 @@ static void detect_colors(void)
                         switch (i) {
                         case RED:
                                 rgb = CV_RGB(255, 0, 0);
+                                print("RED");
                                 break;
 
                         case GREEN:
                                 rgb = CV_RGB(0, 128, 0);
+                                print("GREEN");
                                 break;
 
                         case BLUE:
                                 rgb = CV_RGB(0, 0, 255);
+                                print("BLUE");
                                 break;
 
                         case YELLOW:
                                 rgb = CV_RGB(255, 255, 0);
+                                print("YELLOW");
                                 break;
 
                         case ORANGE:
                                 rgb = CV_RGB(238, 64, 0);
+                                print("ORANGE");
                                 break;
 
                         case BROWN:
                                 rgb = CV_RGB(139, 62, 47);
+                                print("BROWN");
                                 break;
 
                         default:
@@ -237,4 +247,14 @@ static void filter(void)
 
         cvErode(bin_frame, bin_frame, NULL, 1);
         cvErode(bin_frame, bin_frame, NULL, 1);
+}
+
+/**
+ * print - Print text to raw frame
+ *
+ * Print text to raw frame using cvPutText.
+ */
+static void print(const char *str)
+{
+        cvPutText(raw_frame, str, cvPoint(0, 20), &font, CV_RGB(0, 255, 0));
 }
